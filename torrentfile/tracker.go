@@ -1,6 +1,7 @@
 package torrentfile
 
 import (
+	"crypto/rand"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,6 +12,20 @@ import (
 	"github.com/gxmngi/vortex-torrent/bencode"
 	"github.com/gxmngi/vortex-torrent/peers"
 )
+
+// GeneratePeerID creates a well-formed 20-character ASCII peer ID.
+// Format: "-VT0100-" followed by 12 random alphanumeric characters.
+func GeneratePeerID() [20]byte {
+	var peerID [20]byte
+	copy(peerID[:8], []byte("-VT0100-"))
+	const charset = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	b := make([]byte, 12)
+	_, _ = rand.Read(b)
+	for i := range b {
+		peerID[8+i] = charset[int(b[i])%len(charset)]
+	}
+	return peerID
+}
 
 // BuildTrackerURL constructs the GET query URL for announcing to the BitTorrent tracker.
 func (t *TorrentFile) BuildTrackerURL(peerID [20]byte, port uint16) (string, error) {
@@ -26,6 +41,7 @@ func (t *TorrentFile) BuildTrackerURL(peerID [20]byte, port uint16) (string, err
 		"uploaded":   []string{"0"},
 		"downloaded": []string{"0"},
 		"compact":    []string{"1"},
+"numwant":    []string{"50"},
 		"left":       []string{strconv.Itoa(t.Length)},
 	}
 	base.RawQuery = params.Encode()
@@ -39,8 +55,14 @@ func (t *TorrentFile) RequestPeers(peerID [20]byte, port uint16) ([]peers.Peer, 
 		return nil, err
 	}
 
+	req, err := http.NewRequest("GET", trackerURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating tracker request: %w", err)
+	}
+	req.Header.Set("User-Agent", "VortexTorrent/0.1.0")
+
 	client := &http.Client{Timeout: 15 * time.Second}
-	resp, err := client.Get(trackerURL)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("tracker request failed: %w", err)
 	}
