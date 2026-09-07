@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gxmngi/vortex-torrent/bencode"
+	"github.com/gxmngi/vortex-torrent/p2p"
 )
 
 // TorrentFile represents the parsed metadata of a .torrent file.
@@ -51,7 +52,7 @@ func Parse(data []byte) (*TorrentFile, error) {
 		return nil, errors.New("torrent missing raw 'info' bytes")
 	}
 
-	// Compute 20-byte SHA-1 info_hash from the raw bencoded info dictionary bytes
+	// Compute 20-byte SHA-1 info_hash from raw bencoded bytes
 	infoHash := sha1.Sum(infoRaw)
 
 	name, _ := infoDict["name"].(string)
@@ -93,4 +94,30 @@ func Parse(data []byte) (*TorrentFile, error) {
 		Length:      int(length64),
 		Name:        name,
 	}, nil
+}
+
+// DownloadToFile downloads the torrent to a target path on disk.
+func (t *TorrentFile) DownloadToFile(path string) error {
+	peerID := GeneratePeerID()
+
+	peersList, err := t.RequestPeers(peerID, 6881)
+	if err != nil {
+		return fmt.Errorf("requesting peers from tracker: %w", err)
+	}
+
+	if len(peersList) == 0 {
+		return errors.New("tracker returned 0 active peers in the swarm")
+	}
+
+	torrent := p2p.Torrent{
+		Peers:       peersList,
+		PeerID:      peerID,
+		InfoHash:    t.InfoHash,
+		PieceHashes: t.PieceHashes,
+		PieceLength: t.PieceLength,
+		Length:      t.Length,
+		Name:        t.Name,
+	}
+
+	return torrent.Download(path)
 }
