@@ -2,6 +2,7 @@
 
 <p align="left">
   <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go" /></a>
+  <a href="https://github.com/gxmngi/vortex-torrent/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/gxmngi/vortex-torrent/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white" alt="CI" /></a>
   <img src="https://img.shields.io/badge/Spec-BEP_0003-blueviolet?style=flat-square" alt="BEP 0003" />
   <img src="https://img.shields.io/badge/Protocol-BitTorrent_P2P-orange?style=flat-square" alt="Protocol" />
   <img src="https://img.shields.io/badge/Dependencies-Zero_(std_only)-success?style=flat-square" alt="Zero Dependencies" />
