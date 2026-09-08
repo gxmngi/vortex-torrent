@@ -10,6 +10,10 @@
 
 > A high-performance, concurrent BitTorrent P2P client and network engine built from scratch in pure Go.
 
+<p align="center">
+  <img src="assets/demo.gif" alt="VortexTorrent Live P2P Swarm Download Demo" width="100%" />
+</p>
+
 A high-performance, concurrent **BitTorrent P2P client and network engine** written from scratch in pure Go. Built strictly according to the official BitTorrent protocol specifications (BEP 0003) and inspired by Jesse Li's canonical BitTorrent architecture.
 
 VortexTorrent implements a custom **Recursive Descent Bencode Parser**, **Tracker HTTP Announce Client**, **Peer Wire Protocol TCP State Machine**, and a **Concurrent Multi-Peer Downloader** utilizing Go's native goroutines and channels.
