@@ -1,10 +1,14 @@
-# VortexTorrent (`vortex-torrent`)
+# VortexTorrent
 
-[![Go](https://img.shields.io/badge/Go-1.27+-00ADD8?style=flat&logo=go)](https://go.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-all%20passing-success.svg)]()
-[![Dependencies](https://img.shields.io/badge/dependencies-zero%20(std%20only)-blueviolet.svg)]()
+<p align="left">
+  <a href="https://go.dev/"><img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go" /></a>
+  <img src="https://img.shields.io/badge/Spec-BEP_0003-blueviolet?style=flat-square" alt="BEP 0003" />
+  <img src="https://img.shields.io/badge/Protocol-BitTorrent_P2P-orange?style=flat-square" alt="Protocol" />
+  <img src="https://img.shields.io/badge/Dependencies-Zero_(std_only)-success?style=flat-square" alt="Zero Dependencies" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-gray?style=flat-square" alt="License" /></a>
+</p>
+
+> A high-performance, concurrent BitTorrent P2P client and network engine built from scratch in pure Go.
 
 A high-performance, concurrent **BitTorrent P2P client and network engine** written from scratch in pure Go. Built strictly according to the official BitTorrent protocol specifications (BEP 0003) and inspired by Jesse Li's canonical BitTorrent architecture.
 
@@ -165,4 +169,5 @@ VortexTorrent includes comprehensive unit tests with synthetic mock peer servers
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+Distributed under the [MIT License](LICENSE). Maintained by [Rusdan Lamsa (@gxmngi)](https://github.com/gxmngi).
+
