@@ -80,6 +80,9 @@ To maximize network throughput over high-latency TCP connections, each peer work
 ### 4. Cryptographic Piece Verification
 Every assembled piece is verified against its corresponding 20-byte SHA-1 hash from the `.torrent` file before being written to disk. If a piece fails verification (e.g. due to bit rot or malicious peer injection), it is immediately rejected, quarantined, and re-queued for download from an alternate peer.
 
+### 5. Tail-Latency Elimination via End-Game Mode (BEP 0003)
+During the final phase of transfers, lingering uncompleted pieces often bottleneck the swarm due to slow or stalled peers. VortexTorrent's `PieceCoordinator` detects when remaining pieces drop below threshold, switches to **End-Game Mode**, broadcasts redundant piece requests concurrently across all unchoked peers, and issues wire protocol `Cancel` messages (Message ID 8) to lagging peers as soon as the first verified block arrives.
+
 ---
 
 ## Package Architecture
@@ -89,7 +92,7 @@ Every assembled piece is verified against its corresponding 20-byte SHA-1 hash f
 | `bencode/` | Recursive descent parser decoding strings, integers, lists, and dictionaries with raw byte slicing. |
 | `torrentfile/` | High-level `.torrent` parser, 20-byte SHA-1 `info_hash` calculator, and HTTP Tracker announce client. |
 | `peers/` | Compact 6-byte peer format unpacker (`[4B IPv4][2B BigEndian Port]`). |
-| `message/` | 68-byte BitTorrent handshake serializer and wire protocol message codecs (Choke, Unchoke, Have, Bitfield, Request, Piece). |
+| `message/` | 68-byte BitTorrent handshake serializer and wire protocol message codecs (Choke, Unchoke, Have, Bitfield, Request, Piece, Cancel). |
 | `bitfield/` | Thread-safe bit-array tracking piece availability across peers. |
 | `client/` | TCP connection wrapper managing handshake verification, keep-alives, and unchoke state transitions. |
 | `p2p/` | Orchestrator managing concurrent worker goroutines, work distribution queue, and file assembly. |

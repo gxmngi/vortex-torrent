@@ -38,6 +38,30 @@ func FormatRequest(index, begin, length int) *Message {
 	return &Message{ID: MsgRequest, Payload: payload}
 }
 
+// FormatCancel creates a Cancel message telling a peer to drop a requested block (BEP 0003).
+// Payload format: [4B piece index][4B byte offset begin][4B block length]
+func FormatCancel(index, begin, length int) *Message {
+	payload := make([]byte, 12)
+	binary.BigEndian.PutUint32(payload[0:4], uint32(index))
+	binary.BigEndian.PutUint32(payload[4:8], uint32(begin))
+	binary.BigEndian.PutUint32(payload[8:12], uint32(length))
+	return &Message{ID: MsgCancel, Payload: payload}
+}
+
+// ParseCancel extracts the piece index, begin offset, and block length from a Cancel message.
+func ParseCancel(msg *Message) (int, int, int, error) {
+	if msg.ID != MsgCancel {
+		return 0, 0, 0, fmt.Errorf("expected Cancel (ID %d), got ID %d", MsgCancel, msg.ID)
+	}
+	if len(msg.Payload) != 12 {
+		return 0, 0, 0, fmt.Errorf("expected payload length 12, got %d", len(msg.Payload))
+	}
+	index := int(binary.BigEndian.Uint32(msg.Payload[0:4]))
+	begin := int(binary.BigEndian.Uint32(msg.Payload[4:8]))
+	length := int(binary.BigEndian.Uint32(msg.Payload[8:12]))
+	return index, begin, length, nil
+}
+
 // FormatHave creates a Have message informing the peer that we have downloaded a piece.
 func FormatHave(index int) *Message {
 	payload := make([]byte, 4)
@@ -83,6 +107,14 @@ func ParsePiece(index int, buf []byte, msg *Message) (int, error) {
 
 	copy(buf[begin:], data)
 	return len(data), nil
+}
+
+// ParsePieceBegin extracts the byte offset begin from a Piece message payload.
+func ParsePieceBegin(msg *Message) int {
+	if msg == nil || len(msg.Payload) < 8 {
+		return 0
+	}
+	return int(binary.BigEndian.Uint32(msg.Payload[4:8]))
 }
 
 // Serialize encodes a message into wire protocol bytes.

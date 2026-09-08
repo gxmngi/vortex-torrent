@@ -131,6 +131,13 @@ func (c *Client) SendRequest(index, begin, length int) error {
 	return err
 }
 
+// SendCancel sends a Cancel message to tell the peer to drop a requested block (BEP 0003).
+func (c *Client) SendCancel(index, begin, length int) error {
+	cancel := message.FormatCancel(index, begin, length)
+	_, err := c.Conn.Write(cancel.Serialize())
+	return err
+}
+
 // SendInterested announces interest to the peer.
 func (c *Client) SendInterested() error {
 	msg := message.Message{ID: message.MsgInterested}

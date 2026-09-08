@@ -48,6 +48,30 @@ func TestFormatAndParseRequest(t *testing.T) {
 	}
 }
 
+func TestFormatAndParseCancel(t *testing.T) {
+	msg := FormatCancel(7, 0x8000, 16384)
+	serialized := msg.Serialize()
+
+	reader := bytes.NewReader(serialized)
+	readMsg, err := Read(reader)
+	if err != nil {
+		t.Fatalf("Read message failed: %v", err)
+	}
+
+	if readMsg.ID != MsgCancel {
+		t.Errorf("expected ID %d, got %d", MsgCancel, readMsg.ID)
+	}
+
+	idx, begin, length, err := ParseCancel(readMsg)
+	if err != nil {
+		t.Fatalf("ParseCancel failed: %v", err)
+	}
+
+	if idx != 7 || begin != 0x8000 || length != 16384 {
+		t.Errorf("parsed cancel mismatch: idx=%d, begin=%d, length=%d", idx, begin, length)
+	}
+}
+
 func TestParsePiece(t *testing.T) {
 	// Construct a mock piece block
 	blockData := []byte("Hello BitTorrent Block!")
